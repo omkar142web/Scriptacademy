@@ -1,14 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
+import { useSidebar } from '../context/SidebarContext';
 
-export default function Navbar({ onMenuClick }) {
+export default function Navbar() {
   const { tree } = useContent();
+  const { toggle } = useSidebar();
   const location = useLocation();
 
   const segments = location.pathname
     .split('/')
     .filter(Boolean);
+
+  const isLearning = segments.length >= 3;
 
   let context = null;
 
@@ -33,16 +37,18 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <header className="navbar">
-      <button
-        type="button"
-        className="icon-btn navbar-menu"
-        onClick={onMenuClick}
-        aria-label="Toggle navigation"
-      >
-        <span className="menu-icon">
-          <span />
-        </span>
-      </button>
+      {isLearning && (
+        <button
+          type="button"
+          className="icon-btn navbar-menu"
+          onClick={toggle}
+          aria-label="Toggle navigation"
+        >
+          <span className="menu-icon">
+            <span />
+          </span>
+        </button>
+      )}
 
       <Link to="/" className="logo">
         Scriptacademy

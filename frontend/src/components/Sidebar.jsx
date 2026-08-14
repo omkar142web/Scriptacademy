@@ -1,32 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import {
+  Link,
+  NavLink,
+  useParams,
+} from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
 
-function currentSlug(pathname) {
-  return pathname.split('/').filter(Boolean).join('/');
-}
-
-function ancestorsOf(slug) {
-  const parts = slug.split('/');
-  const ancestors = [];
-
-  for (let i = 1; i < parts.length; i += 1) {
-    ancestors.push(parts.slice(0, i).join('/'));
-  }
-
-  return ancestors;
-}
-
 export default function Sidebar({ open, onClose }) {
   const { tree, treeStatus, retryTree } = useContent();
-  const location = useLocation();
+  const { domain, subject, module: moduleName } = useParams();
 
-  const slug = currentSlug(location.pathname);
+  const subjectNode = useMemo(() => {
+    if (!Array.isArray(tree)) {
+      return null;
+    }
 
-  const ancestors = useMemo(
-    () => ancestorsOf(slug),
-    [slug]
+    const domainNode = tree.find(
+      node => node.name === domain
+    );
+
+    if (!domainNode) {
+      return null;
+    }
+
+    return (
+      (domainNode.children || []).find(
+        node => node.name === subject
+      ) || null
+    );
+  }, [tree, domain, subject]);
+
+  const modules = useMemo(
+    () =>
+      (subjectNode?.children || []).filter(
+        node => node.type === 'folder'
+      ),
+    [subjectNode]
   );
 
   const [expanded, setExpanded] = useState(
@@ -34,91 +44,52 @@ export default function Sidebar({ open, onClose }) {
   );
 
   useEffect(() => {
-    setExpanded(previous => {
-      const next = new Set(previous);
-      let changed = false;
+    if (!moduleName) {
+      return;
+    }
 
-      for (const ancestor of ancestors) {
-        if (!next.has(ancestor)) {
-          next.add(ancestor);
-          changed = true;
-        }
+    setExpanded(previous => {
+      if (previous.has(moduleName)) {
+        return previous;
       }
 
-      return changed ? next : previous;
+      const next = new Set(previous);
+      next.add(moduleName);
+      return next;
     });
-  }, [ancestors]);
+  }, [moduleName]);
 
-  const toggle = nodeSlug => {
+  const toggle = name => {
     setExpanded(previous => {
       const next = new Set(previous);
 
-      if (next.has(nodeSlug)) {
-        next.delete(nodeSlug);
+      if (next.has(name)) {
+        next.delete(name);
       } else {
-        next.add(nodeSlug);
+        next.add(name);
       }
 
       return next;
     });
   };
 
-  function renderNode(node) {
-    if (node.type === 'lesson') {
-      return (
-        <NavLink
-          key={node.slug}
-          to={`/${node.slug}`}
-          end
-          onClick={onClose}
-          className={({ isActive }) =>
-            `sidebar-link${isActive ? ' active' : ''}`
-          }
-        >
-          {node.title}
-        </NavLink>
-      );
-    }
-
-    const isOpen = expanded.has(node.slug);
-
-    return (
-      <div
-        key={node.slug}
-        className="sidebar-group"
-      >
-        <button
-          type="button"
-          className={`sidebar-group-title${
-            slug === node.slug ? ' active' : ''
-          }`}
-          onClick={() => toggle(node.slug)}
-          aria-expanded={isOpen}
-        >
-          <span
-            className={`chevron${
-              isOpen ? ' chevron--open' : ''
-            }`}
-          />
-          <span className="sidebar-group-label">
-            {node.title}
-          </span>
-        </button>
-
-        {isOpen && (
-          <div className="sidebar-children">
-            {node.children.map(renderNode)}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <>
       <aside
         className={`sidebar${open ? ' sidebar--open' : ''}`}
       >
+        {subjectNode && (
+          <div className="sidebar-header">
+            <Link
+              to={`/${domain}/${subject}`}
+              className="sidebar-subject-link"
+              onClick={onClose}
+            >
+              {subjectNode.title}
+            </Link>
+          </div>
+        )}
+
         <div className="sidebar-scroll">
           {treeStatus === 'loading' && (
             <div className="sidebar-status">
@@ -140,7 +111,59 @@ export default function Sidebar({ open, onClose }) {
           )}
 
           {treeStatus === 'ready' &&
-            tree.map(renderNode)}
+            modules.map(module => {
+              const isOpen = expanded.has(module.name);
+              const isCurrent = module.name === moduleName;
+
+              return (
+                <div
+                  key={module.slug}
+                  className="sidebar-group"
+                >
+                  <button
+                    type="button"
+                    className={`sidebar-group-title${
+                      isCurrent ? ' active' : ''
+                    }`}
+                    onClick={() => toggle(module.name)}
+                    aria-expanded={isOpen}
+                  >
+                    <span
+                      className={`chevron${
+                        isOpen ? ' chevron--open' : ''
+                      }`}
+                    />
+                    <span className="sidebar-group-label">
+                      {module.title}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="sidebar-children">
+                      {module.children
+                        .filter(
+                          node => node.type === 'lesson'
+                        )
+                        .map(lesson => (
+                          <NavLink
+                            key={lesson.slug}
+                            to={`/${lesson.slug}`}
+                            end
+                            onClick={onClose}
+                            className={({ isActive }) =>
+                              `sidebar-link${
+                                isActive ? ' active' : ''
+                              }`
+                            }
+                          >
+                            {lesson.title}
+                          </NavLink>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </aside>
 
