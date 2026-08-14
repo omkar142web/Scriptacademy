@@ -15,7 +15,7 @@ app.use(express.json());
 /*
   Health check
 */
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
   });
@@ -27,7 +27,7 @@ app.get('/api/health', (req, res) => {
   React uses this to build
   the sidebar automatically.
 */
-app.get('/api/content/tree', (req, res) => {
+app.get(['/api/content/tree', '/content/tree'], (req, res) => {
   try {
     const tree = buildContentTree();
 
@@ -48,7 +48,7 @@ app.get('/api/content/tree', (req, res) => {
 
   /api/content/lesson?path=programming/javascript/basics/intro
 */
-app.get('/api/content/lesson', (req, res) => {
+app.get(['/api/content/lesson', '/content/lesson'], (req, res) => {
   try {
     const slug = req.query.path;
 

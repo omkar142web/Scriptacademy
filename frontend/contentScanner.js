@@ -1,9 +1,31 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const CONTENT_DIR = path.resolve(
-  process.env.CONTENT_DIR || '../../content'
-);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function getContentDir() {
+  const possiblePaths = [
+    process.env.CONTENT_DIR,
+    path.resolve(process.cwd(), 'content'),
+    path.resolve(process.cwd(), '../content'),
+    path.resolve(process.cwd(), '../../content'),
+    path.resolve(__dirname, 'content'),
+    path.resolve(__dirname, '../content'),
+    path.resolve(__dirname, '../../content'),
+  ].filter(Boolean);
+
+  for (const dirPath of possiblePaths) {
+    if (fs.existsSync(dirPath)) {
+      return dirPath;
+    }
+  }
+
+  return possiblePaths[0] || path.resolve(process.cwd(), 'content');
+}
+
+const CONTENT_DIR = getContentDir();
 
 /*
   Recursively find every Markdown file.
@@ -16,6 +38,10 @@ function scanDirectory(directory, relativePath = '') {
   const result = [];
 
   for (const entry of entries) {
+    if (entry.name.startsWith('.')) {
+      continue;
+    }
+
     const fullPath = path.join(directory, entry.name);
 
     const entryRelativePath = path.join(
