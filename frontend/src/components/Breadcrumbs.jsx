@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 
+import { ChevronIcon, HomeIcon } from './Icons';
+
 export default function Breadcrumbs({ items }) {
   return (
     <nav className="breadcrumbs" aria-label="Breadcrumb">
-      <Link to="/" className="breadcrumb-link">
-        Home
+      <Link
+        to="/"
+        className="breadcrumb-link breadcrumb-home"
+      >
+        <HomeIcon className="breadcrumb-home-icon" />
+        <span>Home</span>
       </Link>
 
       {items.map((item, index) => {
@@ -12,7 +18,7 @@ export default function Breadcrumbs({ items }) {
 
         return (
           <span key={item.slug} className="breadcrumb-item">
-            <span className="breadcrumb-separator">/</span>
+            <ChevronIcon className="breadcrumb-separator" />
 
             {isLast ? (
               <span className="breadcrumb-current">

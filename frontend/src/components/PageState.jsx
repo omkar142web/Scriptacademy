@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+import { ArrowLeftIcon } from './Icons';
+
 export function LoadingState({ label = 'Loading...' }) {
   return (
     <div className="state" role="status">
@@ -21,7 +23,8 @@ export function NotFoundState({
       <p>{message}</p>
       {backTo && (
         <Link to={backTo} className="btn">
-          &larr; {backLabel || 'Go Back'}
+          <ArrowLeftIcon className="btn-icon" />
+          {backLabel || 'Go Back'}
         </Link>
       )}
     </div>

@@ -5,6 +5,10 @@ import formatTitle from '../utils/formatTitle';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import Breadcrumbs from '../components/Breadcrumbs';
 import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from '../components/Icons';
+import {
   BackendErrorState,
   LoadingState,
   NotFoundState,
@@ -55,7 +59,7 @@ export default function LessonPage() {
             to={`/${data.prev.slug}`}
             className="lesson-nav-btn lesson-nav-btn--prev"
           >
-            <span className="lesson-nav-arrow">&larr;</span>
+            <ArrowLeftIcon className="lesson-nav-arrow" />
             <span>
               <span className="lesson-nav-label">Previous</span>
               <span className="lesson-nav-title">
@@ -78,7 +82,7 @@ export default function LessonPage() {
                 {data.next.title}
               </span>
             </span>
-            <span className="lesson-nav-arrow">&rarr;</span>
+            <ArrowRightIcon className="lesson-nav-arrow" />
           </Link>
         ) : (
           <span />

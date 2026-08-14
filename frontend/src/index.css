@@ -106,32 +106,8 @@ button {
 .menu-icon {
   display: block;
   width: 18px;
-  height: 12px;
-  position: relative;
-}
-
-.menu-icon::before,
-.menu-icon::after,
-.menu-icon > span {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: #e7eaf1;
-}
-
-.menu-icon::before {
-  top: 0;
-}
-
-.menu-icon::after {
-  bottom: 0;
-}
-
-.menu-icon > span {
-  top: 5px;
+  height: 18px;
+  color: #e7eaf1;
 }
 
 /* Layout */
@@ -269,19 +245,16 @@ button {
 }
 
 .chevron {
-  width: 0;
-  height: 0;
+  width: 14px;
+  height: 14px;
 
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid #6b7385;
+  flex-shrink: 0;
 
   transition: transform 0.15s;
-  flex-shrink: 0;
 }
 
 .chevron--open {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 .sidebar-group-label {
@@ -349,9 +322,25 @@ button {
   color: #e7eaf1;
 }
 
+.breadcrumb-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.breadcrumb-home-icon {
+  width: 13px;
+  height: 13px;
+}
+
 .breadcrumb-separator {
-  opacity: 0.5;
-  margin: 0 2px;
+  width: 14px;
+  height: 14px;
+  margin: 0 1px;
+  color: #6b7385;
+  flex-shrink: 0;
+  position: relative;
+  top: 2px;
 }
 
 .breadcrumb-current {
@@ -701,7 +690,8 @@ button {
 }
 
 .lesson-nav-arrow {
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
   color: #7fb0ff;
   flex-shrink: 0;
 }
@@ -801,6 +791,11 @@ button {
 .btn:hover {
   background: #293347;
   border-color: #3a4560;
+}
+
+.btn-icon {
+  width: 15px;
+  height: 15px;
 }
 
 /* Responsive */

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
 import { useSidebar } from '../context/SidebarContext';
+import { MenuIcon } from './Icons';
 
 export default function Navbar() {
   const { tree } = useContent();
@@ -44,9 +45,7 @@ export default function Navbar() {
           onClick={toggle}
           aria-label="Toggle navigation"
         >
-          <span className="menu-icon">
-            <span />
-          </span>
+          <MenuIcon className="menu-icon" />
         </button>
       )}
 

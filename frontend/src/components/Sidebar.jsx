@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
+import { ChevronIcon } from './Icons';
 
 export default function Sidebar({ open, onClose }) {
   const { tree, treeStatus, retryTree } = useContent();
@@ -128,7 +129,7 @@ export default function Sidebar({ open, onClose }) {
                     onClick={() => toggle(module.name)}
                     aria-expanded={isOpen}
                   >
-                    <span
+                    <ChevronIcon
                       className={`chevron${
                         isOpen ? ' chevron--open' : ''
                       }`}
