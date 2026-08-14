@@ -1,6 +1,8 @@
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 export async function getContentTree() {
   const response = await fetch(
-    '/api/content/tree'
+    `${API_URL}/content/tree`
   );
 
   if (!response.ok) {
@@ -14,7 +16,7 @@ export async function getContentTree() {
 
 export async function getLesson(path) {
   const response = await fetch(
-    `/api/content/lesson?path=${encodeURIComponent(path)}`
+    `${API_URL}/content/lesson?path=${encodeURIComponent(path)}`
   );
 
   if (!response.ok) {

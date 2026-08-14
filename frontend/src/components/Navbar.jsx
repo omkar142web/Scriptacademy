@@ -7,7 +7,7 @@ export default function Navbar() {
         to="/"
         className="logo"
       >
-        Learn
+        Scriptacademy
       </Link>
     </header>
   );

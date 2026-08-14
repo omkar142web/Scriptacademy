@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CONTENT_DIR = path.resolve(
-  __dirname,
-  '../../content'
+  process.env.CONTENT_DIR || '../../content'
 );
 
 /*
