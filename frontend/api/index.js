@@ -1,11 +1,11 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
-const {
+import {
   getLesson,
   readLesson,
   buildContentTree,
-} = require('./contentScanner');
+} from '../contentScanner.js';
 
 const app = express();
 
@@ -81,10 +81,4 @@ app.get('/api/content/lesson', (req, res) => {
   }
 });
 
-const PORT = 5000;
-
-app.listen(PORT, () => {
-  console.log(
-    `Backend running at http://localhost:${PORT}`
-  );
-});
+export default app;

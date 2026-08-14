@@ -1,6 +1,10 @@
 {
   "framework": "vite",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": "dist"
+  "buildCommand": "rm -rf content && git clone --depth 1 https://github.com/omkar142web/learning-curriculum content && npm install && npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "content/**"
+    }
+  }
 }

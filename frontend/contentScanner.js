@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const CONTENT_DIR = path.resolve(
   process.env.CONTENT_DIR || '../../content'
@@ -186,7 +186,7 @@ function readLesson(lesson) {
   );
 }
 
-module.exports = {
+export {
   getAllLessons,
   getLesson,
   readLesson,
