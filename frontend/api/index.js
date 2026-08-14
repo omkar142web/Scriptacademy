@@ -3,7 +3,7 @@ import cors from 'cors';
 
 import {
   getLesson,
-  readLesson,
+  getNode,
   buildContentTree,
 } from '../contentScanner.js';
 
@@ -22,10 +22,9 @@ app.get(['/api/health', '/health'], (req, res) => {
 });
 
 /*
-  Get entire content structure.
+  Get the entire content structure.
 
-  React uses this to build
-  the sidebar automatically.
+  React uses this to build the sidebar automatically.
 */
 app.get(['/api/content/tree', '/content/tree'], (req, res) => {
   try {
@@ -42,11 +41,47 @@ app.get(['/api/content/tree', '/content/tree'], (req, res) => {
 });
 
 /*
-  Get a specific Markdown lesson.
+  Get a single node (domain, subject or module) by its path.
 
   Example:
 
-  /api/content/lesson?path=programming/javascript/basics/intro
+  /api/content/node?path=programming/javascript
+*/
+app.get(['/api/content/node', '/content/node'], (req, res) => {
+  try {
+    const slug = req.query.path;
+
+    if (!slug) {
+      return res.status(400).json({
+        error: 'Missing node path',
+      });
+    }
+
+    const node = getNode(slug);
+
+    if (!node) {
+      return res.status(404).json({
+        error: 'Node not found',
+      });
+    }
+
+    res.json(node);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Failed to load node',
+    });
+  }
+});
+
+/*
+  Get a specific Markdown lesson, including its metadata,
+  breadcrumbs and previous/next siblings.
+
+  Example:
+
+  /api/content/lesson?path=programming/javascript/basics/data-types
 */
 app.get(['/api/content/lesson', '/content/lesson'], (req, res) => {
   try {
@@ -66,12 +101,7 @@ app.get(['/api/content/lesson', '/content/lesson'], (req, res) => {
       });
     }
 
-    const content = readLesson(lesson);
-
-    res.json({
-      slug: lesson.slug,
-      content,
-    });
+    res.json(lesson);
   } catch (error) {
     console.error(error);
 

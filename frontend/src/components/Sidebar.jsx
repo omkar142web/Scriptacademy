@@ -1,79 +1,155 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 
-import { getContentTree } from '../services/contentApi';
+import { useContent } from '../context/ContentContext';
 
-function TreeNode({ item }) {
-  if (item.type === 'lesson') {
-    return (
-      <Link
-        to={`/${item.slug}`}
-        className="sidebar-link"
-      >
-        {item.title}
-      </Link>
-    );
-  }
-
-  return (
-    <div className="sidebar-folder">
-      <div className="sidebar-folder-title">
-        {item.title}
-      </div>
-
-      <div className="sidebar-children">
-        {item.children.map(child => (
-          <TreeNode
-            key={
-              child.slug ||
-              child.name
-            }
-            item={child}
-          />
-        ))}
-      </div>
-    </div>
-  );
+function currentSlug(pathname) {
+  return pathname.split('/').filter(Boolean).join('/');
 }
 
-export default function Sidebar() {
-  const [tree, setTree] = useState([]);
-  const [loading, setLoading] =
-    useState(true);
+function ancestorsOf(slug) {
+  const parts = slug.split('/');
+  const ancestors = [];
+
+  for (let i = 1; i < parts.length; i += 1) {
+    ancestors.push(parts.slice(0, i).join('/'));
+  }
+
+  return ancestors;
+}
+
+export default function Sidebar({ open, onClose }) {
+  const { tree, treeStatus, retryTree } = useContent();
+  const location = useLocation();
+
+  const slug = currentSlug(location.pathname);
+
+  const ancestors = useMemo(
+    () => ancestorsOf(slug),
+    [slug]
+  );
+
+  const [expanded, setExpanded] = useState(
+    () => new Set()
+  );
 
   useEffect(() => {
-    async function loadTree() {
-      try {
-        const data =
-          await getContentTree();
+    setExpanded(previous => {
+      const next = new Set(previous);
+      let changed = false;
 
-        setTree(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+      for (const ancestor of ancestors) {
+        if (!next.has(ancestor)) {
+          next.add(ancestor);
+          changed = true;
+        }
       }
+
+      return changed ? next : previous;
+    });
+  }, [ancestors]);
+
+  const toggle = nodeSlug => {
+    setExpanded(previous => {
+      const next = new Set(previous);
+
+      if (next.has(nodeSlug)) {
+        next.delete(nodeSlug);
+      } else {
+        next.add(nodeSlug);
+      }
+
+      return next;
+    });
+  };
+
+  function renderNode(node) {
+    if (node.type === 'lesson') {
+      return (
+        <NavLink
+          key={node.slug}
+          to={`/${node.slug}`}
+          end
+          onClick={onClose}
+          className={({ isActive }) =>
+            `sidebar-link${isActive ? ' active' : ''}`
+          }
+        >
+          {node.title}
+        </NavLink>
+      );
     }
 
-    loadTree();
-  }, []);
+    const isOpen = expanded.has(node.slug);
 
-  if (loading) {
     return (
-      <aside className="sidebar">
-        Loading...
-      </aside>
+      <div
+        key={node.slug}
+        className="sidebar-group"
+      >
+        <button
+          type="button"
+          className={`sidebar-group-title${
+            slug === node.slug ? ' active' : ''
+          }`}
+          onClick={() => toggle(node.slug)}
+          aria-expanded={isOpen}
+        >
+          <span
+            className={`chevron${
+              isOpen ? ' chevron--open' : ''
+            }`}
+          />
+          <span className="sidebar-group-label">
+            {node.title}
+          </span>
+        </button>
+
+        {isOpen && (
+          <div className="sidebar-children">
+            {node.children.map(renderNode)}
+          </div>
+        )}
+      </div>
     );
   }
 
   return (
-    <aside className="sidebar">
-      {tree.map(item => (
-        <TreeNode
-          key={item.name}
-          item={item}
+    <>
+      <aside
+        className={`sidebar${open ? ' sidebar--open' : ''}`}
+      >
+        <div className="sidebar-scroll">
+          {treeStatus === 'loading' && (
+            <div className="sidebar-status">
+              Loading content...
+            </div>
+          )}
+
+          {treeStatus === 'error' && (
+            <div className="sidebar-status">
+              Couldn't load content.
+              <button
+                type="button"
+                className="sidebar-retry"
+                onClick={retryTree}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {treeStatus === 'ready' &&
+            tree.map(renderNode)}
+        </div>
+      </aside>
+
+      {open && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onClose}
         />
-      ))}
-    </aside>
+      )}
+    </>
   );
 }

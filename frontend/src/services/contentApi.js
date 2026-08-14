@@ -1,33 +1,27 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env?.VITE_API_URL || '/api';
 
-export async function getContentTree() {
-  const response = await fetch(
-    `${API_URL}/content/tree`
-  );
+async function request(path) {
+  const response = await fetch(`${API_URL}${path}`);
+
+  if (response.status === 404) {
+    return null;
+  }
 
   if (!response.ok) {
-    throw new Error(
-      'Failed to load content tree'
-    );
+    throw new Error(`Request failed: ${path}`);
   }
 
   return response.json();
 }
 
+export async function getContentTree() {
+  return request('/content/tree');
+}
+
+export async function getNode(path) {
+  return request(`/content/node?path=${encodeURIComponent(path)}`);
+}
+
 export async function getLesson(path) {
-  const response = await fetch(
-    `${API_URL}/content/lesson?path=${encodeURIComponent(path)}`
-  );
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      return null;
-    }
-
-    throw new Error(
-      'Failed to load lesson'
-    );
-  }
-
-  return response.json();
+  return request(`/content/lesson?path=${encodeURIComponent(path)}`);
 }
