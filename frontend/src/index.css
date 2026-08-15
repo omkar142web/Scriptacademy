@@ -305,7 +305,7 @@ button {
   text-align: left;
 }
 
-.sidebar-group-title.active {
+button.sidebar-group-title.active {
   color: var(--text-link);
   background: rgba(79, 141, 255, 0.08);
 }
@@ -354,7 +354,7 @@ button {
     color 0.12s;
 }
 
-.sidebar-link.active {
+a.sidebar-link.active {
   background: rgba(79, 141, 255, 0.13);
   color: var(--text-link);
   font-weight: 600;
@@ -886,19 +886,8 @@ button {
   transition: background 0.12s, color 0.12s;
 }
 
-.markdown .code-block-copy:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
 .markdown .code-block-copy--copied {
   color: var(--success);
-}
-
-.markdown .code-block-copy--copied:hover {
-  color: var(--success);
-  background: transparent;
-  cursor: default;
 }
 
 .markdown pre {
@@ -968,9 +957,6 @@ button {
   background: var(--bg-table-stripe);
 }
 
-.markdown tbody tr:hover td {
-  background: var(--bg-table-hover);
-}
 
 /* Footnotes */
 
@@ -1356,5 +1342,20 @@ button {
 
   .icon-btn:hover {
     background: var(--bg-hover);
+  }
+  
+  .markdown tbody tr:hover td {
+    background: var(--bg-table-hover);
+  }
+
+  .markdown .code-block-copy:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .markdown .code-block-copy--copied:hover {
+    color: var(--success);
+    background: transparent;
+    cursor: default;
   }
 }
