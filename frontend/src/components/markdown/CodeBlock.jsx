@@ -150,7 +150,11 @@ export function Pre({ node, children }) {
         <span className="code-block-lang">{title || formatLanguage(lang)}</span>
         <button
           type="button"
-          className="code-block-copy"
+          className={
+            copied
+              ? 'code-block-copy code-block-copy--copied'
+              : 'code-block-copy'
+          }
           onClick={handleCopy}
           aria-label="Copy code to clipboard"
         >

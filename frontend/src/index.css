@@ -891,6 +891,16 @@ button {
   color: var(--text-primary);
 }
 
+.markdown .code-block-copy--copied {
+  color: var(--success);
+}
+
+.markdown .code-block-copy--copied:hover {
+  color: var(--success);
+  background: transparent;
+  cursor: default;
+}
+
 .markdown pre {
   margin: 0;
   padding: 16px 18px;
