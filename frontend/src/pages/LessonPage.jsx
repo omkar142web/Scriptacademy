@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import useLesson from '../hooks/useLesson';
 import formatTitle from '../utils/formatTitle';
-import MarkdownRenderer from '../components/MarkdownRenderer';
+import MarkdownRenderer from '../components/markdown';
 import Breadcrumbs from '../components/Breadcrumbs';
 import {
   ArrowLeftIcon,

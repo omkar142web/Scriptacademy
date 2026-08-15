@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import 'highlight.js/styles/github-dark.css';
+import 'katex/dist/katex.min.css';
 import './index.css';
 
 createRoot(

@@ -38,6 +38,58 @@ button {
   cursor: pointer;
 }
 
+:focus-visible {
+  outline: 2px solid #4f8dff;
+  outline-offset: 2px;
+}
+
+/* Thin scrollbars, shared by every internal scroll container.
+   Matches the reference viewer: 6px, page-background track, muted
+   thumb with a 3px radius, brightening to secondary text on hover. */
+
+.sidebar-scroll,
+.markdown pre,
+.markdown .table-wrapper,
+.markdown .katex-display,
+.markdown .mermaid-holder {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7385 #0f1116;
+}
+
+.sidebar-scroll::-webkit-scrollbar,
+.markdown pre::-webkit-scrollbar,
+.markdown .table-wrapper::-webkit-scrollbar,
+.markdown .katex-display::-webkit-scrollbar,
+.markdown .mermaid-holder::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track,
+.markdown pre::-webkit-scrollbar-track,
+.markdown .table-wrapper::-webkit-scrollbar-track,
+.markdown .katex-display::-webkit-scrollbar-track,
+.markdown .mermaid-holder::-webkit-scrollbar-track {
+  background: #0f1116;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb,
+.markdown pre::-webkit-scrollbar-thumb,
+.markdown .table-wrapper::-webkit-scrollbar-thumb,
+.markdown .katex-display::-webkit-scrollbar-thumb,
+.markdown .mermaid-holder::-webkit-scrollbar-thumb {
+  background: #6b7385;
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover,
+.markdown pre::-webkit-scrollbar-thumb:hover,
+.markdown .table-wrapper::-webkit-scrollbar-thumb:hover,
+.markdown .katex-display::-webkit-scrollbar-thumb:hover,
+.markdown .mermaid-holder::-webkit-scrollbar-thumb:hover {
+  background: #98a1b3;
+}
+
 /* Navbar */
 
 .navbar {
@@ -170,15 +222,6 @@ button {
   flex: 1;
   overflow-y: auto;
   padding: 14px 12px 32px;
-}
-
-.sidebar-scroll::-webkit-scrollbar {
-  width: 8px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb {
-  background: #2a3140;
-  border-radius: 8px;
 }
 
 .sidebar-status {
@@ -459,10 +502,22 @@ button {
   margin-top: 0;
 }
 
+/* Headings (H1–H6) */
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  position: relative;
+  scroll-margin-top: 76px;
+}
+
 .markdown h1 {
   font-size: 32px;
   line-height: 1.2;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-weight: 700;
   color: #fff;
 }
@@ -482,15 +537,127 @@ button {
   color: #f1f3f8;
 }
 
+.markdown h4 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  color: #f1f3f8;
+}
+
+.markdown h5 {
+  font-size: 15px;
+  margin: 22px 0 8px;
+  color: #e7eaf1;
+}
+
+.markdown h6 {
+  font-size: 14px;
+  margin: 20px 0 8px;
+  font-weight: 650;
+  color: #c8cedb;
+}
+
+.markdown :target {
+  border-radius: 6px;
+  background: rgba(127, 176, 255, 0.09);
+}
+
+/* Heading anchor links */
+
+.markdown .heading-anchor {
+  opacity: 0;
+  margin-left: 8px;
+  color: #6b7385;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.12s, color 0.12s;
+}
+
+.markdown h1:hover .heading-anchor,
+.markdown h2:hover .heading-anchor,
+.markdown h3:hover .heading-anchor,
+.markdown h4:hover .heading-anchor,
+.markdown h5:hover .heading-anchor,
+.markdown h6:hover .heading-anchor,
+.markdown .heading-anchor:focus {
+  opacity: 1;
+}
+
+/* Paragraphs & inline text */
+
 .markdown p {
   margin: 14px 0;
 }
 
 .markdown a {
   color: #7fb0ff;
+  text-decoration: none;
+}
+
+.markdown a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
+
+/* Heading anchors are decorational; never underline them. */
+
+.markdown a.heading-anchor:hover {
+  text-decoration: none;
+}
+
+.markdown strong {
+  color: #f1f3f8;
+  font-weight: 700;
+}
+
+.markdown del {
+  color: #6b7385;
+}
+
+.markdown mark {
+  background: rgba(210, 153, 34, 0.22);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+.markdown kbd {
+  display: inline-block;
+  padding: 1px 7px;
+  font-family:
+    "SF Mono",
+    "JetBrains Mono",
+    "Fira Code",
+    Consolas,
+    monospace;
+  font-size: 0.82em;
+  line-height: 1.55;
+  color: #e7eaf1;
+  background: #1b212c;
+  border: 1px solid #2c3547;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+
+/* Inline code */
+
+.markdown code:not(pre code) {
+  font-family:
+    "SF Mono",
+    "JetBrains Mono",
+    "Fira Code",
+    Consolas,
+    monospace;
+  font-size: 0.87em;
+  background: #1b212c;
+  border: 1px solid #232936;
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+  color: #c9d7ef;
+  overflow-wrap: break-word;
+}
+
+/* Lists */
 
 .markdown ul,
 .markdown ol {
@@ -502,61 +669,40 @@ button {
   margin: 5px 0;
 }
 
+.markdown li > ul,
+.markdown li > ol {
+  margin-top: 6px;
+}
+
 .markdown li::marker {
   color: #6b7385;
 }
 
-.markdown code {
-  font-family:
-    "SF Mono",
-    "JetBrains Mono",
-    "Fira Code",
-    Consolas,
-    monospace;
-  font-size: 0.9em;
-  background: #1b212c;
-  padding: 2px 6px;
-  border-radius: 5px;
-  color: #c9d7ef;
+.markdown ol > li::marker {
+  color: #7fb0ff;
 }
 
-.markdown .code-block {
-  margin: 20px 0;
-  border-radius: 10px;
-  border: 1px solid #262b37;
-  overflow: hidden;
-  background: #12161f;
+/* Task lists */
+
+.markdown .task-list-item {
+  list-style: none;
 }
 
-.markdown .code-block-header {
-  padding: 8px 14px;
+.markdown .task-list-item > input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  accent-color: #4f8dff;
+  cursor: pointer;
+}
 
-  font-family:
-    "SF Mono",
-    Consolas,
-    monospace;
-  font-size: 11.5px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.markdown .task-list-item.task-done {
   color: #6b7385;
-
-  background: #171c27;
-  border-bottom: 1px solid #232936;
+  text-decoration: line-through;
 }
 
-.markdown pre {
-  margin: 0;
-  padding: 16px 18px;
-  overflow-x: auto;
-}
-
-.markdown pre code {
-  background: transparent;
-  padding: 0;
-  color: #d6e0f0;
-  font-size: 13.5px;
-  line-height: 1.6;
-}
+/* Blockquotes */
 
 .markdown blockquote {
   margin: 18px 0;
@@ -571,10 +717,182 @@ button {
   margin: 8px 0;
 }
 
+.markdown blockquote blockquote {
+  margin: 12px 0;
+  background: transparent;
+  border-left-color: #2c3547;
+}
+
+/* GitHub-style alerts ([!NOTE], [!TIP], ...) */
+
+.markdown blockquote.md-alert {
+  border-left-width: 4px;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  color: #c8cedb;
+}
+
+.markdown blockquote.md-alert::before {
+  display: block;
+  content: attr(data-alert);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.markdown blockquote.md-alert p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown blockquote.md-alert-note {
+  background: rgba(79, 141, 255, 0.07);
+  border-left-color: #4f8dff;
+}
+.markdown blockquote.md-alert-note::before {
+  color: #7fb0ff;
+}
+
+.markdown blockquote.md-alert-tip {
+  background: rgba(63, 185, 80, 0.07);
+  border-left-color: #3fb950;
+}
+.markdown blockquote.md-alert-tip::before {
+  color: #3fb950;
+}
+
+.markdown blockquote.md-alert-important {
+  background: rgba(163, 113, 247, 0.08);
+  border-left-color: #a371f7;
+}
+.markdown blockquote.md-alert-important::before {
+  color: #a371f7;
+}
+
+.markdown blockquote.md-alert-warning {
+  background: rgba(210, 153, 34, 0.08);
+  border-left-color: #d29922;
+}
+.markdown blockquote.md-alert-warning::before {
+  color: #d29922;
+}
+
+.markdown blockquote.md-alert-caution {
+  background: rgba(248, 81, 73, 0.08);
+  border-left-color: #f85149;
+}
+.markdown blockquote.md-alert-caution::before {
+  color: #f85149;
+}
+
+/* Horizontal rules */
+
+.markdown hr {
+  border: none;
+  height: 1px;
+  background: #262b37;
+  margin: 2.4em 0;
+}
+
+/* Code blocks */
+
+.markdown .code-block {
+  margin: 20px 0;
+  border-radius: 10px;
+  border: 1px solid #262b37;
+  overflow: hidden;
+  background: #12161f;
+}
+
+.markdown .code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 14px;
+
+  background: #171c27;
+  border-bottom: 1px solid #232936;
+}
+
+.markdown .code-block-lang {
+  font-family:
+    "SF Mono",
+    Consolas,
+    monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7385;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markdown .code-block-copy {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #98a1b3;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background 0.12s, color 0.12s;
+}
+
+.markdown .code-block-copy:hover {
+  background: #1d2330;
+  color: #e7eaf1;
+}
+
+.markdown pre {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  tab-size: 2;
+}
+
+.markdown pre code {
+  display: block;
+  font-family:
+    "SF Mono",
+    "JetBrains Mono",
+    "Fira Code",
+    Consolas,
+    monospace;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #d6e0f0;
+  background: transparent;
+  padding: 0;
+}
+
+/* Keep the highlight.js theme colors but drop its background so the
+   code block surface stays consistent with the app. */
+.markdown pre code.hljs {
+  background: transparent;
+  color: #d6e0f0;
+}
+
+.markdown pre:focus-visible {
+  outline: 2px solid #4f8dff;
+  outline-offset: -2px;
+}
+
+/* Tables */
+
+.markdown .table-wrapper {
+  margin: 18px 0;
+  overflow-x: auto;
+  border: 1px solid #262b37;
+  border-radius: 10px;
+}
+
 .markdown table {
   width: 100%;
+  min-width: 420px;
   border-collapse: collapse;
-  margin: 18px 0;
   font-size: 14.5px;
 }
 
@@ -591,14 +909,115 @@ button {
   font-weight: 600;
 }
 
-.markdown tr:nth-child(even) td {
+.markdown tbody tr:nth-child(even) td {
   background: #131821;
 }
 
+.markdown tbody tr:hover td {
+  background: #161b26;
+}
+
+/* Footnotes */
+
+.markdown sup {
+  line-height: 0;
+}
+
+.markdown sup > a[href^="#user-content-fn-"] {
+  color: #7fb0ff;
+  text-decoration: none;
+  font-size: 0.75em;
+}
+
+.markdown a[href^="#user-content-fnref-"] {
+  color: #6b7385;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.markdown section[data-footnotes] {
+  margin-top: 2.6em;
+  padding-top: 1.1em;
+  border-top: 1px solid #262b37;
+  font-size: 14px;
+  color: #98a1b3;
+}
+
+.markdown section[data-footnotes] ol {
+  margin: 0;
+  padding-left: 1.6em;
+}
+
+.markdown section[data-footnotes] li {
+  margin: 0.35em 0;
+}
+
+.markdown section[data-footnotes] > h2,
+.markdown section[data-footnotes] > div[data-footnotes-title] {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f3f8;
+  margin: 0 0 8px;
+}
+
+/* Math */
+
+.markdown .katex-display {
+  margin: 1.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+.markdown .katex {
+  font-size: 1.05em;
+}
+
+/* Mermaid diagrams */
+
+.markdown .mermaid-holder {
+  margin: 20px 0;
+  padding: 24px;
+  background: #161a23;
+  border: 1px solid #262b37;
+  border-radius: 10px;
+  overflow-x: auto;
+  text-align: center;
+  color: #98a1b3;
+  font-size: 13px;
+}
+
+.markdown .mermaid-holder svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.markdown .mermaid-holder--error {
+  text-align: left;
+}
+
+.markdown .mermaid-holder--error pre {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+}
+
+.markdown .mermaid-holder-error {
+  color: #f85149;
+  font-size: 12px;
+}
+
+/* Images */
+
 .markdown img {
   max-width: 100%;
+  height: auto;
   border-radius: 10px;
   border: 1px solid #262b37;
+}
+
+.markdown img.md-image--broken {
+  border-style: dashed;
+  opacity: 0.6;
 }
 
 /* Lesson prev/next navigation */
@@ -813,6 +1232,14 @@ button {
     font-size: 15.5px;
   }
 
+  .markdown pre code {
+    font-size: 12.5px;
+  }
+
+  .markdown .table-wrapper {
+    border-radius: 8px;
+  }
+
   .cards {
     grid-template-columns: 1fr;
   }
@@ -826,10 +1253,6 @@ button {
   .sidebar-subject-link:hover {
     background: #1d2330;
     color: #fff;
-  }
-
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: #3a4254;
   }
 
   .sidebar-retry:hover {
