@@ -2,17 +2,20 @@ import { Link, useParams } from 'react-router-dom';
 
 import useNode from '../hooks/useNode';
 import formatTitle from '../utils/formatTitle';
+import { useProgress } from '../context/ProgressContext';
 import Breadcrumbs from '../components/Breadcrumbs';
 import {
   BackendErrorState,
   LoadingState,
   NotFoundState,
 } from '../components/PageState';
+import { CheckIcon } from '../components/Icons';
 
 export default function ModulePage() {
   const { domain, subject, module: moduleName } = useParams();
   const slug = `${domain}/${subject}/${moduleName}`;
   const { node, status } = useNode(slug);
+  const { isCompleted } = useProgress();
 
   if (status === 'loading') {
     return <LoadingState label="Loading module..." />;
@@ -46,28 +49,40 @@ export default function ModulePage() {
       <h2 className="section-title">Lessons</h2>
 
       <ol className="lesson-list">
-        {node.children.map((lesson, index) => (
-          <li key={lesson.slug}>
-            <Link
-              to={`/${lesson.slug}`}
-              className="lesson-list-link"
-            >
-              <span className="lesson-list-number">
-                {index + 1}
-              </span>
-              <span className="lesson-list-body">
-                <span className="lesson-list-title">
-                  {lesson.title}
+        {node.children.map((lesson, index) => {
+          const complete = isCompleted(lesson.slug);
+
+          return (
+            <li key={lesson.slug}>
+              <Link
+                to={`/${lesson.slug}`}
+                className="lesson-list-link"
+              >
+                <span
+                  className={`lesson-list-number${
+                    complete ? ' is-complete' : ''
+                  }`}
+                >
+                  {complete ? (
+                    <CheckIcon className="lesson-list-check" />
+                  ) : (
+                    index + 1
+                  )}
                 </span>
-                {lesson.description && (
-                  <span className="lesson-list-desc">
-                    {lesson.description}
+                <span className="lesson-list-body">
+                  <span className="lesson-list-title">
+                    {lesson.title}
                   </span>
-                )}
-              </span>
-            </Link>
-          </li>
-        ))}
+                  {lesson.description && (
+                    <span className="lesson-list-desc">
+                      {lesson.description}
+                    </span>
+                  )}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ol>
     </main>
   );

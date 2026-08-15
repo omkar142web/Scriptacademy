@@ -70,3 +70,11 @@ export function ArrowRightIcon({ className, label }) {
     </IconBase>
   );
 }
+
+export function CheckIcon({ className, label }) {
+  return (
+    <IconBase className={className} label={label}>
+      <path d="M20 6 9 17l-5-5" />
+    </IconBase>
+  );
+}

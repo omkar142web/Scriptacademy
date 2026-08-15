@@ -6,10 +6,12 @@ import {
 } from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
-import { ChevronIcon } from './Icons';
+import { useProgress } from '../context/ProgressContext';
+import { CheckIcon, ChevronIcon } from './Icons';
 
 export default function Sidebar({ open, onClose }) {
   const { tree, treeStatus, retryTree } = useContent();
+  const { isCompleted } = useProgress();
   const { domain, subject, module: moduleName } = useParams();
 
   const subjectNode = useMemo(() => {
@@ -39,6 +41,24 @@ export default function Sidebar({ open, onClose }) {
       ),
     [subjectNode]
   );
+
+  const lessonCount = useMemo(() => {
+    if (!subjectNode) return 0;
+
+    let count = 0;
+    const walk = nodes => {
+      for (const node of nodes) {
+        if (node.type === 'lesson') {
+          count += 1;
+        } else {
+          walk(node.children || []);
+        }
+      }
+    };
+
+    walk(subjectNode.children || []);
+    return count;
+  }, [subjectNode]);
 
   const [expanded, setExpanded] = useState(
     () => new Set()
@@ -88,6 +108,10 @@ export default function Sidebar({ open, onClose }) {
             >
               {subjectNode.title}
             </Link>
+            <div className="sidebar-meta">
+              {lessonCount} lessons
+              {modules.length > 0 && ` · ${modules.length} sections`}
+            </div>
           </div>
         )}
 
@@ -157,7 +181,21 @@ export default function Sidebar({ open, onClose }) {
                               }`
                             }
                           >
-                            {lesson.title}
+                            <span
+                              className={`lesson-status${
+                                isCompleted(lesson.slug)
+                                  ? ' is-complete'
+                                  : ''
+                              }`}
+                              aria-hidden="true"
+                            >
+                              {isCompleted(lesson.slug) && (
+                                <CheckIcon className="lesson-status-check" />
+                              )}
+                            </span>
+                            <span className="sidebar-lesson-label">
+                              {lesson.title}
+                            </span>
                           </NavLink>
                         ))}
                     </div>

@@ -25,6 +25,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
+import { useEffect, useMemo, useRef } from 'react';
 
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -60,7 +61,7 @@ import dart from 'highlight.js/lib/languages/dart';
 import scala from 'highlight.js/lib/languages/scala';
 import graphql from 'highlight.js/lib/languages/graphql';
 
-import { remarkAlerts, remarkMark, remarkEmoji, rehypePreserveCodeMeta } from './plugins';
+import { remarkAlerts, remarkMark, remarkEmoji, rehypePreserveCodeMeta, rehypeCollectHeadings } from './plugins';
 import { Pre, Code } from './CodeBlock';
 import { Heading, Link, Image, Table, Input } from './elements';
 
@@ -138,7 +139,28 @@ const components = {
   input: Input,
 };
 
-export default function MarkdownRenderer({ content }) {
+export default function MarkdownRenderer({ content, onHeadings }) {
+  const headingsRef = useRef([]);
+  headingsRef.current = [];
+
+  const rehypePlugins = useMemo(
+    () => [
+      rehypePreserveCodeMeta,
+      rehypeRaw,
+      rehypeKatex,
+      [rehypeHighlight, { languages: HIGHLIGHT_LANGUAGES }],
+      rehypeSlug,
+      rehypeCollectHeadings(headingsRef),
+    ],
+    []
+  );
+
+  useEffect(() => {
+    if (onHeadings) {
+      onHeadings(headingsRef.current);
+    }
+  }, [content, onHeadings]);
+
   return (
     <article className="markdown">
       <ReactMarkdown
@@ -149,13 +171,7 @@ export default function MarkdownRenderer({ content }) {
           remarkMark,
           remarkEmoji,
         ]}
-        rehypePlugins={[
-          rehypePreserveCodeMeta,
-          rehypeRaw,
-          rehypeKatex,
-          [rehypeHighlight, { languages: HIGHLIGHT_LANGUAGES }],
-          rehypeSlug,
-        ]}
+        rehypePlugins={rehypePlugins}
         components={components}
       >
         {content}

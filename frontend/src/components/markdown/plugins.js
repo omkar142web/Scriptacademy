@@ -31,6 +31,43 @@ export function rehypePreserveCodeMeta() {
   };
 }
 
+/*
+  Collect every heading in the rendered document so the lesson page
+  can build an "On this page" table of contents.
+
+  Must run after `rehype-slug`, which assigns the `id` each heading
+  links to. The collected items are written onto `targetRef.current`.
+*/
+function collectText(node) {
+  if (node.type === 'text') return node.value;
+  if (node.type === 'element') {
+    return (node.children || []).map(collectText).join('');
+  }
+  return '';
+}
+
+export function rehypeCollectHeadings(targetRef) {
+  return () => (tree) => {
+    const items = [];
+
+    visit(tree, 'element', (node) => {
+      const match = /^h([1-6])$/.exec(node.tagName || '');
+      if (!match || !node.properties?.id) return;
+
+      const text = collectText(node).trim();
+      if (!text) return;
+
+      items.push({
+        id: node.properties.id,
+        depth: Number(match[1]),
+        text,
+      });
+    });
+
+    targetRef.current = items;
+  };
+}
+
 const ALERT_TYPES = {
   NOTE: 'note',
   TIP: 'tip',
