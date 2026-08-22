@@ -1059,6 +1059,7 @@ a.sidebar-link.active {
 .markdown img.md-image--broken {
   border-style: dashed;
   opacity: 0.6;
+  padding: 8px;
 }
 
 /* Lesson prev/next navigation */
