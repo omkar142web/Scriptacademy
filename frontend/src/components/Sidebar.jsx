@@ -1,16 +1,69 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Link,
-  NavLink,
-  useParams,
-} from 'react-router-dom';
+import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
 
 import { useContent } from '../context/ContentContext';
 import { ChevronIcon } from './Icons';
 
+function SidebarTree({ nodes, expanded, toggle, onClose }) {
+  return nodes.map((node) => {
+    if (node.type === 'lesson') {
+      return (
+        <NavLink
+          key={node.slug}
+          to={`/${node.slug}`}
+          onClick={onClose}
+          className={({ isActive }) =>
+            `sidebar-link${isActive ? ' active' : ''}`
+          }
+        >
+          {node.title}
+        </NavLink>
+      );
+    }
+
+    const isOpen = expanded.has(node.slug);
+
+    return (
+      <div key={node.slug} className="sidebar-group">
+        <button
+          type="button"
+          className={`sidebar-group-title${
+            isOpen ? ' active' : ''
+          }`}
+          onClick={() => toggle(node.slug)}
+          aria-expanded={isOpen}
+        >
+          <ChevronIcon
+            className={`chevron${
+              isOpen ? ' chevron--open' : ''
+            }`}
+          />
+          <span className="sidebar-group-label">
+            {node.title}
+          </span>
+        </button>
+
+        {isOpen && (
+          <div className="sidebar-children">
+            <SidebarTree
+              nodes={node.children}
+              expanded={expanded}
+              toggle={toggle}
+              onClose={onClose}
+            />
+          </div>
+        )}
+      </div>
+    );
+  });
+}
+
 export default function Sidebar({ open, onClose }) {
   const { tree, treeStatus, retryTree } = useContent();
-  const { domain, subject, module: moduleName } = useParams();
+  const { domain, subject } = useParams();
+  const location = useLocation();
+
+  const currentSlug = location.pathname.replace(/^\/+|\/+$/g, '');
 
   const subjectNode = useMemo(() => {
     if (!Array.isArray(tree)) {
@@ -18,7 +71,7 @@ export default function Sidebar({ open, onClose }) {
     }
 
     const domainNode = tree.find(
-      node => node.name === domain
+      (node) => node.name === domain,
     );
 
     if (!domainNode) {
@@ -27,47 +80,40 @@ export default function Sidebar({ open, onClose }) {
 
     return (
       (domainNode.children || []).find(
-        node => node.name === subject
+        (node) => node.name === subject,
       ) || null
     );
   }, [tree, domain, subject]);
 
-  const modules = useMemo(
-    () =>
-      (subjectNode?.children || []).filter(
-        node => node.type === 'folder'
-      ),
-    [subjectNode]
-  );
-
-  const [expanded, setExpanded] = useState(
-    () => new Set()
-  );
+  const [expanded, setExpanded] = useState(() => new Set());
 
   useEffect(() => {
-    if (!moduleName) {
+    if (!subjectNode || !currentSlug) {
       return;
     }
 
-    setExpanded(previous => {
-      if (previous.has(moduleName)) {
-        return previous;
-      }
-
+    setExpanded((previous) => {
       const next = new Set(previous);
-      next.add(moduleName);
+
+      currentSlug.split('/').reduce((prefix, segment) => {
+        const path = prefix ? `${prefix}/${segment}` : segment;
+        // Expand every ancestor folder so the active lesson stays visible.
+        next.add(path);
+        return path;
+      }, '');
+
       return next;
     });
-  }, [moduleName]);
+  }, [currentSlug, subjectNode]);
 
-  const toggle = name => {
-    setExpanded(previous => {
+  const toggle = (slug) => {
+    setExpanded((previous) => {
       const next = new Set(previous);
 
-      if (next.has(name)) {
-        next.delete(name);
+      if (next.has(slug)) {
+        next.delete(slug);
       } else {
-        next.add(name);
+        next.add(slug);
       }
 
       return next;
@@ -112,59 +158,15 @@ export default function Sidebar({ open, onClose }) {
           )}
 
           {treeStatus === 'ready' &&
-            modules.map(module => {
-              const isOpen = expanded.has(module.name);
-              const isCurrent = module.name === moduleName;
-
-              return (
-                <div
-                  key={module.slug}
-                  className="sidebar-group"
-                >
-                  <button
-                    type="button"
-                    className={`sidebar-group-title${
-                      isCurrent ? ' active' : ''
-                    }`}
-                    onClick={() => toggle(module.name)}
-                    aria-expanded={isOpen}
-                  >
-                    <ChevronIcon
-                      className={`chevron${
-                        isOpen ? ' chevron--open' : ''
-                      }`}
-                    />
-                    <span className="sidebar-group-label">
-                      {module.title}
-                    </span>
-                  </button>
-
-                  {isOpen && (
-                    <div className="sidebar-children">
-                      {module.children
-                        .filter(
-                          node => node.type === 'lesson'
-                        )
-                        .map(lesson => (
-                          <NavLink
-                            key={lesson.slug}
-                            to={`/${lesson.slug}`}
-                            end
-                            onClick={onClose}
-                            className={({ isActive }) =>
-                              `sidebar-link${
-                                isActive ? ' active' : ''
-                              }`
-                            }
-                          >
-                            {lesson.title}
-                          </NavLink>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            subjectNode &&
+            subjectNode.children && (
+              <SidebarTree
+                nodes={subjectNode.children}
+                expanded={expanded}
+                toggle={toggle}
+                onClose={onClose}
+              />
+            )}
         </div>
       </aside>
 

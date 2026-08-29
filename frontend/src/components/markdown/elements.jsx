@@ -61,7 +61,7 @@ export function Heading({ node, children, ...props }) {
   External links open in a new tab with rel protection. Internal
   lesson links (ending in `.md`) navigate client-side via the router.
 */
-export function Link({ href, children }) {
+export function Link({ href, children, basePath }) {
   if (!href) {
     return <a>{children}</a>;
   }
@@ -81,11 +81,39 @@ export function Link({ href, children }) {
   }
 
   if (/\.md$/i.test(href)) {
-    const to = `/${href.replace(/\.md$/i, '').replace(/^\.\//, '')}`;
+    const to = resolveLessonPath(href, basePath);
     return <RouterLink to={to}>{children}</RouterLink>;
   }
 
   return <a href={href}>{children}</a>;
+}
+
+/*
+  Turn a Markdown link into a client-side route.
+
+  - Absolute links (`/foo/bar.md`) are rooted at `/`.
+  - Relative links (`./bar.md`, `../foo/baz.md`) are resolved against the
+    current lesson's directory (`basePath`), so links keep working no
+    matter how deeply a lesson is nested.
+*/
+function resolveLessonPath(href, basePath) {
+  const cleaned = href.replace(/\.md$/i, '');
+  const segments = cleaned.startsWith('/') ? [] : (basePath || '').split('/');
+
+  for (const part of cleaned.split('/')) {
+    if (part === '' || part === '.') {
+      continue;
+    }
+
+    if (part === '..') {
+      segments.pop();
+      continue;
+    }
+
+    segments.push(part);
+  }
+
+  return `/${segments.filter(Boolean).join('/')}`;
 }
 
 /*

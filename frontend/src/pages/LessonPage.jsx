@@ -1,69 +1,51 @@
-import { Link, useParams } from 'react-router-dom';
+/*
+  LessonContent
+  ─────────────
+  Presentational renderer for a single lesson. The lesson data (body,
+  breadcrumbs, prev/next) is resolved by the parent `LearningPage` and
+  passed in as `lesson`.
 
-import useLesson from '../hooks/useLesson';
-import formatTitle from '../utils/formatTitle';
+  Relative Markdown links (e.g. `[Variables](./variables.md)`) are
+  resolved against this lesson's directory so they keep working no
+  matter how deep the URL is nested.
+*/
+
+import { Link } from 'react-router-dom';
+
 import MarkdownRenderer from '../components/markdown';
 import Breadcrumbs from '../components/Breadcrumbs';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
 } from '../components/Icons';
-import {
-  BackendErrorState,
-  LoadingState,
-  NotFoundState,
-} from '../components/PageState';
 
-export default function LessonPage() {
-  const {
-    domain,
-    subject,
-    module: moduleName,
-    lesson,
-  } = useParams();
-
-  const slug = [domain, subject, moduleName, lesson]
-    .filter(Boolean)
-    .join('/');
-
-  const { lesson: data, status } = useLesson(slug);
-
-  if (status === 'loading') {
-    return <LoadingState label="Loading lesson..." />;
-  }
-
-  if (status === 'error') {
-    return <BackendErrorState />;
-  }
-
-  if (status === 'notfound') {
-    return (
-      <NotFoundState
-        title="Lesson Not Found"
-        message="The lesson you're looking for doesn't exist."
-        backTo={`/${domain}/${subject}/${moduleName}`}
-        backLabel={`Back to ${formatTitle(moduleName)}`}
-      />
-    );
-  }
+export default function LessonContent({ lesson }) {
+  const basePath = lesson.slug
+    ? lesson.slug.split('/').slice(0, -1).join('/')
+    : '';
 
   return (
     <main className="lesson-page">
-      <Breadcrumbs items={data.breadcrumbs} />
+      <Breadcrumbs items={lesson.breadcrumbs} />
 
-      <MarkdownRenderer content={data.content} />
+      <MarkdownRenderer
+        content={lesson.content}
+        basePath={basePath}
+      />
 
       <nav className="lesson-nav" aria-label="Lesson navigation">
-        {data.prev ? (
+        {lesson.prev ? (
           <Link
-            to={`/${data.prev.slug}`}
+            to={`/${lesson.prev.slug}`}
             className="lesson-nav-btn lesson-nav-btn--prev"
           >
             <ArrowLeftIcon className="lesson-nav-arrow" />
             <span>
-              <span className="lesson-nav-label">Previous</span>
+              <span className="lesson-nav-label">
+                Previous
+              </span>
               <span className="lesson-nav-title">
-                {data.prev.title}
+                {lesson.prev.title}
               </span>
             </span>
           </Link>
@@ -71,15 +53,17 @@ export default function LessonPage() {
           <span />
         )}
 
-        {data.next ? (
+        {lesson.next ? (
           <Link
-            to={`/${data.next.slug}`}
+            to={`/${lesson.next.slug}`}
             className="lesson-nav-btn lesson-nav-btn--next"
           >
             <span>
-              <span className="lesson-nav-label">Next</span>
+              <span className="lesson-nav-label">
+                Next
+              </span>
               <span className="lesson-nav-title">
-                {data.next.title}
+                {lesson.next.title}
               </span>
             </span>
             <ArrowRightIcon className="lesson-nav-arrow" />

@@ -138,7 +138,14 @@ const components = {
   input: Input,
 };
 
-export default function MarkdownRenderer({ content }) {
+export default function MarkdownRenderer({ content, basePath = '' }) {
+  // `basePath` (the lesson's directory slug) lets relative Markdown
+  // links resolve correctly under the nested content structure.
+  const resolvedComponents = {
+    ...components,
+    a: (props) => Link({ ...props, basePath }),
+  };
+
   return (
     <article className="markdown">
       <ReactMarkdown
@@ -156,7 +163,7 @@ export default function MarkdownRenderer({ content }) {
           [rehypeHighlight, { languages: HIGHLIGHT_LANGUAGES }],
           rehypeSlug,
         ]}
-        components={components}
+        components={resolvedComponents}
       >
         {content}
       </ReactMarkdown>
